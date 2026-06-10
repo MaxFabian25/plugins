@@ -1,0 +1,27 @@
+{
+  "default": {
+    "description": "Default Codex workstation profile: only the currently installed and intended-live plugin surface.",
+    "maxVisibleSkills": 40,
+    "enabled": [
+      "codex-real-engineering-skills@codex-real-engineering-skills",
+      "computer-use@openai-bundled",
+      "context7@local-codex",
+      "maximilian-universal-workflow@local-codex",
+      "plugin-eval@openai-curated"
+    ]
+  },
+  "academic-research": {
+    "description": "Default profile plus currently configured research discovery, academic writing, Python analysis, and visualization workbenches.",
+    "extends": "default",
+    "enable": [
+      "python-data-analysis@local-codex",
+      "python-visualization-workbench@local-codex",
+      "research-discovery@local-codex",
+      "academic-writing@local-codex"
+    ]
+  },
+  "full-installed": {
+    "description": "Enable every configured plugin stanza. Use only for explicit broad inventory or discovery runs.",
+    "enableAllConfigured": true
+  }
+}

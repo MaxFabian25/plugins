@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__/
+/.relocation-archive/
+
+# Nested plugin and skill repos are independent GitHub-backed source trees.
+/plugins/*
+!/plugins/.gitkeep
+
+/skills/*
+!/skills/.gitkeep
