@@ -58,12 +58,47 @@ def load_marketplace_plugins(
             errors.append(f"plugin {name!r} manifest has unsafe cache version: {version!r}")
         plugins[name] = (plugin_dir, version)
 
+    flat_plugin_repos, flat_plugin_errors = discover_flat_plugin_repos(plugins_root)
+    errors.extend(flat_plugin_errors)
+    missing_marketplace_entries = sorted(set(flat_plugin_repos) - set(plugins))
+    if missing_marketplace_entries:
+        errors.append(
+            "flat plugin repos missing marketplace entries: "
+            + ", ".join(
+                f"{name} ({flat_plugin_repos[name]})" for name in missing_marketplace_entries
+            )
+        )
+
     source_dirs = sorted(path.name for path in plugins_root.iterdir() if path.is_dir())
     missing_dirs = sorted(set(plugins) - set(source_dirs))
     if missing_dirs:
         errors.append(f"plugins missing on disk for marketplace entries: {', '.join(missing_dirs)}")
 
     return plugins, errors
+
+
+def discover_flat_plugin_repos(plugins_root: Path) -> tuple[dict[str, Path], list[str]]:
+    errors: list[str] = []
+    plugin_repos: dict[str, Path] = {}
+    for plugin_dir in sorted(path for path in plugins_root.iterdir() if path.is_dir()):
+        manifest_path = plugin_dir / ".codex-plugin" / "plugin.json"
+        if not manifest_path.is_file():
+            continue
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        name = manifest.get("name")
+        if not isinstance(name, str) or not name.strip():
+            errors.append(
+                f"flat plugin repo {plugin_dir} has manifest without a non-empty string name"
+            )
+            continue
+        existing = plugin_repos.get(name)
+        if existing is not None:
+            errors.append(
+                f"flat plugin manifest name {name!r} appears in multiple repos: {existing}, {plugin_dir}"
+            )
+            continue
+        plugin_repos[name] = plugin_dir
+    return plugin_repos, errors
 
 
 def load_local_plugin_config(config_path: Path) -> tuple[list[str], list[str]]:
