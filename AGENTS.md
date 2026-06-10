@@ -2,13 +2,13 @@
 
 ## Workspace Role
 
-This directory is an umbrella workspace for locally developed Codex plugins and standalone Codex skills.
+This directory is an umbrella workspace for locally developed Codex plugins.
 
 - Put each plugin repo under `plugins/<plugin-name>/`.
-- Put each standalone skill repo under `skills/<skill-name>/`.
-- Treat each plugin or skill source subdirectory as the root of its own GitHub-backed repository.
+- Treat each plugin source subdirectory as the root of its own GitHub-backed repository.
 - Keep the umbrella root limited to coordination docs, shared maintenance, and workspace-level metadata.
-- Do not put plugin or skill source directly at the umbrella root.
+- Do not put plugin source directly at the umbrella root.
+- Standalone Codex skills live in `/Users/maxibon/Documents/Maximilian's-codex-skills` and `MaxFabian25/skills`.
 
 ## Hard Cutovers Preference
 
