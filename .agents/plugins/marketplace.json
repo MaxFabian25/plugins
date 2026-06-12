@@ -44,7 +44,7 @@
       "name": "maximilian-universal-workflow",
       "source": {
         "source": "local",
-        "path": "./plugins/maximilian-universal-workflow/plugins/maximilian-universal-workflow"
+        "path": "./plugins/maximilian-universal-workflow"
       },
       "policy": {
         "installation": "AVAILABLE",

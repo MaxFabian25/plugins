@@ -37,6 +37,13 @@ def load_marketplace_plugins(
         name = entry["name"]
         source = entry["source"]
         relative_path = source["path"] if isinstance(source, dict) else source
+        expected_relative_path = f"./plugins/{name}"
+        if relative_path != expected_relative_path:
+            errors.append(
+                f"marketplace entry {name!r} must use flat plugin path "
+                f"{expected_relative_path!r}, got {relative_path!r}"
+            )
+            continue
         plugin_dir = marketplace_path.parent.parent.parent / relative_path
         manifest_path = plugin_dir / ".codex-plugin" / "plugin.json"
         if not plugin_dir.is_dir():

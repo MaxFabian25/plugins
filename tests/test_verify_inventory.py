@@ -90,6 +90,35 @@ class VerifyInventoryTests(unittest.TestCase):
         self.assertEqual(["registered"], sorted(plugins))
         self.assertEqual([], errors)
 
+    def test_nested_marketplace_path_does_not_satisfy_flat_repo(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            plugins_root = root / "plugins"
+            write_plugin(plugins_root / "registered", "registered")
+            write_plugin(
+                plugins_root / "registered" / "plugins" / "registered",
+                "registered",
+            )
+            marketplace_path = write_marketplace(
+                root,
+                [("registered", "./plugins/registered/plugins/registered")],
+            )
+
+            plugins, errors = verify_inventory.load_marketplace_plugins(
+                marketplace_path,
+                plugins_root,
+            )
+
+        self.assertEqual([], sorted(plugins))
+        self.assertTrue(
+            any(
+                "marketplace entry 'registered' must use flat plugin path './plugins/registered'"
+                in error
+                for error in errors
+            ),
+            errors,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
