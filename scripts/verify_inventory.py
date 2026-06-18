@@ -12,6 +12,7 @@ from pathlib import Path
 
 
 LOCAL_CODEX_SUFFIX = "@local-codex"
+LOCAL_CODEX_MARKETPLACE = "local-codex"
 CODEX_HOME = Path.home() / ".codex"
 MARKETPLACE_ROOT = Path(__file__).resolve().parents[1]
 
@@ -120,6 +121,40 @@ def load_local_plugin_config(config_path: Path) -> tuple[list[str], list[str]]:
         if value.get("enabled") is True:
             enabled_names.append(name)
     return sorted(configured_names), sorted(enabled_names)
+
+
+def profile_plugin_ids(profile: object) -> set[str]:
+    if not isinstance(profile, dict):
+        return set()
+
+    plugin_ids: set[str] = set()
+    for key in ("enabled", "enable", "disable"):
+        values = profile.get(key, [])
+        if not isinstance(values, list):
+            continue
+        plugin_ids.update(value for value in values if isinstance(value, str))
+    return plugin_ids
+
+
+def load_profile_plugin_errors(profile_path: Path, local_plugin_names: set[str]) -> list[str]:
+    errors: list[str] = []
+    data = json.loads(profile_path.read_text(encoding="utf-8"))
+    for profile_name, profile in sorted(data.items()):
+        for plugin_id in sorted(profile_plugin_ids(profile)):
+            if "@" not in plugin_id:
+                continue
+            plugin_name, marketplace_name = plugin_id.rsplit("@", 1)
+            if marketplace_name == LOCAL_CODEX_MARKETPLACE and plugin_name not in local_plugin_names:
+                errors.append(
+                    f"profile {profile_name!r} references unknown local-codex plugin "
+                    f"{plugin_name!r}"
+                )
+            elif plugin_name in local_plugin_names and marketplace_name != LOCAL_CODEX_MARKETPLACE:
+                errors.append(
+                    f"profile {profile_name!r} references local plugin {plugin_name!r} "
+                    f"as {plugin_id!r}; expected {plugin_name + LOCAL_CODEX_SUFFIX!r}"
+                )
+    return errors
 
 
 def expected_cache_names(
@@ -233,6 +268,7 @@ def main() -> int:
     codex_home = CODEX_HOME
     marketplace_root = MARKETPLACE_ROOT
     marketplace_path = marketplace_root / ".agents" / "plugins" / "marketplace.json"
+    profile_path = marketplace_root / "scripts" / "plugin_profiles.json"
     plugins_root = marketplace_root / "plugins"
     config_path = codex_home / "config.toml"
     cache_root = codex_home / "plugins" / "cache" / "local-codex"
@@ -241,6 +277,7 @@ def main() -> int:
     marketplace_plugins, marketplace_errors = load_marketplace_plugins(marketplace_path, plugins_root)
     errors.extend(marketplace_errors)
     marketplace_names = sorted(marketplace_plugins)
+    errors.extend(load_profile_plugin_errors(profile_path, set(marketplace_names)))
 
     configured_names, enabled_names = load_local_plugin_config(config_path)
     extra_config = sorted(set(configured_names) - set(marketplace_names))

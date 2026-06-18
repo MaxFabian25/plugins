@@ -46,6 +46,13 @@ def write_marketplace(root: Path, entries: list[tuple[str, str]]) -> Path:
     return marketplace_path
 
 
+def write_profiles(root: Path, profiles: dict[str, object]) -> Path:
+    profile_path = root / "scripts" / "plugin_profiles.json"
+    profile_path.parent.mkdir(parents=True)
+    profile_path.write_text(json.dumps(profiles), encoding="utf-8")
+    return profile_path
+
+
 class VerifyInventoryTests(unittest.TestCase):
     def test_flat_plugin_repo_missing_from_marketplace_is_error(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -116,6 +123,34 @@ class VerifyInventoryTests(unittest.TestCase):
                 in error
                 for error in errors
             ),
+            errors,
+        )
+
+    def test_profile_reference_to_local_plugin_must_use_local_codex_marketplace(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            profile_path = write_profiles(
+                root,
+                {
+                    "default": {
+                        "enabled": [
+                            "registered@registered",
+                            "computer-use@openai-bundled",
+                        ],
+                    },
+                },
+            )
+
+            errors = verify_inventory.load_profile_plugin_errors(
+                profile_path,
+                {"registered"},
+            )
+
+        self.assertEqual(
+            [
+                "profile 'default' references local plugin 'registered' "
+                "as 'registered@registered'; expected 'registered@local-codex'"
+            ],
             errors,
         )
 

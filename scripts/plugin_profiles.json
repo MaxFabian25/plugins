@@ -3,7 +3,7 @@
     "description": "Default Codex workstation profile: only the currently installed and intended-live plugin surface.",
     "maxVisibleSkills": 40,
     "enabled": [
-      "codex-real-engineering-skills@codex-real-engineering-skills",
+      "codex-real-engineering-skills@local-codex",
       "computer-use@openai-bundled",
       "context7@local-codex",
       "maximilian-universal-workflow@local-codex",
