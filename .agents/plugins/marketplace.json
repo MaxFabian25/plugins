@@ -103,8 +103,9 @@
     {
       "name": "prose",
       "source": {
-        "source": "url",
+        "source": "git-subdir",
         "url": "https://github.com/MaxFabian25/prose.git",
+        "path": "plugin",
         "ref": "main"
       },
       "policy": {
