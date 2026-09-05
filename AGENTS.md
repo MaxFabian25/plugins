@@ -14,6 +14,15 @@ This directory is an umbrella workspace for locally developed Codex plugins.
 
 Prefer hard cutovers; do not keep compatibility.
 
+## Code and tests
+
+Before keeping an abstraction or extension point, identify its current caller and the behavior
+that needs it. Remove duplicate capabilities and controls used only by tests. Each test should
+catch a meaningful failure through an actual interface that another retained check would miss.
+Assert the required result, not source text, internal call order, or incidental fixture formatting.
+For a simplification, verify the affected acceptance conditions and keep the diff within their
+causal path.
+
 ## Documentation
 
 Consult authoritative documentation when an API or configuration decision needs verification.
