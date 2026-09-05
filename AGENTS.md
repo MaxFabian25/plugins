@@ -14,10 +14,14 @@ This directory is an umbrella workspace for locally developed Codex plugins.
 
 Prefer hard cutovers; do not keep compatibility.
 
-## Context7
+## Documentation
 
-Always use `ctx7` when library/API documentation, code generation, setup, or configuration steps are needed.
+Consult authoritative documentation when an API or configuration decision needs verification.
+Prefer `ctx7` when it provides the relevant documentation. Use the local source or official
+documentation directly when it already answers the question or the tool is unavailable.
 
 ## `request_user_input`
 
-Always call the `request_user_input` tool whenever intent or preference is remotely unclear.
+Ask when missing information materially affects the requested result or a consequential choice
+cannot be inferred from the conversation. Resolve routine, reversible choices using the available
+context and continue the work already authorised.
